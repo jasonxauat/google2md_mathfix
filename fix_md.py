@@ -1,24 +1,16 @@
 import os
 import re
 
-def fix_google_md(directory):
+def fix_content(content):
     """
-    Scans all .md files in the given directory and fixes formatting issues
-    caused by Google Docs export (aggressive escaping).
+    Applies regex replacements to fix Google Docs export issues AND Pandoc conversion issues.
     """
-    print(f"Scanning directory: {directory}")
-    
-    # List of regex replacements. Order matters!
-    # Regex note: in python string r'\\', it's one backslash. In regex, \\ matches literal backslash.
-    # So r'\\\\' matches literal \\ in text.
-    # r'\\\+' matches literal \ followed by +.
-    
     replacements = [
         (r'\\\\', r'\\'),      # Replace \\ with \ 
         (r'\\_', r'_'),        # Replace \_ with _
         (r'\\=', r'='),        # Replace \= with =
         (r'\\-', r'-'),        # Replace \- with -
-        (r'\\\+', r'+'),       # Replace \+ with +  <-- Fixed regex
+        (r'\\\+', r'+'),       # Replace \+ with +
         (r'\\\.', r'.'),       # Replace \. with .
         (r'\\\[', r'['),       # Replace \[ with [
         (r'\\\]', r']'),       # Replace \] with ]
@@ -28,8 +20,26 @@ def fix_google_md(directory):
         (r'\\\}', r'}'),       # Replace \} with }
         (r'\\\*', r'*'),       # Replace \* with *
         (r'\\\|', r'|'),       # Replace \| with |
+        (r'\\\$', r'$'),       # Replace \$ with $ (Fix for Pandoc docx->md)
         (r'## ---', r'---'),   # Replace ## --- with --- (restore horizontal rule)
     ]
+    
+    for pattern, repl in replacements:
+        content = re.sub(pattern, repl, content)
+        
+    # Prepend YAML header for Word conversion
+    yaml_header = "---\noutput: word_document\n---\n\n"
+    if not content.startswith("---"):
+        content = yaml_header + content
+        
+    return content
+
+def fix_google_md(directory):
+    """
+    Scans all .md files in the given directory and fixes formatting issues
+    caused by Google Docs export (aggressive escaping).
+    """
+    print(f"Scanning directory: {directory}")
 
     for filename in os.listdir(directory):
         if filename.endswith(".md"):
@@ -40,18 +50,11 @@ def fix_google_md(directory):
                 content = f.read()
             
             original_content = content
+            fixed_content = fix_content(content)
             
-            for pattern, repl in replacements:
-                content = re.sub(pattern, repl, content)
-
-            # Prepend YAML header for Word conversion
-            yaml_header = "---\noutput: word_document\n---\n\n"
-            if not content.startswith("---"):
-                content = yaml_header + content
-            
-            if content != original_content:
+            if fixed_content != original_content:
                 with open(filepath, 'w', encoding='utf-8') as f:
-                    f.write(content)
+                    f.write(fixed_content)
                 print(f"  Fixed.")
             else:
                 print(f"  No changes needed.")

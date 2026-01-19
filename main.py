@@ -4,6 +4,9 @@ import sys
 import subprocess
 import shutil
 
+# Import shared fix logic
+from fix_md import fix_content
+
 def get_application_path():
     """
     Get the directory where the application is running.
@@ -24,37 +27,62 @@ def check_pandoc():
     except (subprocess.CalledProcessError, FileNotFoundError):
         return False
 
-def fix_content(content):
+
+
+
+
+def process_docx_files(app_path):
     """
-    Applies regex replacements to fix Google Docs export issues.
+    Scans for .docx files and converts them to .md.
+    Locations:
+      1. 'google_docx' folder -> converts to 'google_md'
+      2. Root folder -> converts to Root folder
     """
-    replacements = [
-        (r'\\\\', r'\\'),      # Replace \\ with \ 
-        (r'\\_', r'_'),        # Replace \_ with _
-        (r'\\=', r'='),        # Replace \= with =
-        (r'\\-', r'-'),        # Replace \- with -
-        (r'\\\+', r'+'),       # Replace \+ with +
-        (r'\\\.', r'.'),       # Replace \. with .
-        (r'\\\[', r'['),       # Replace \[ with [
-        (r'\\\]', r']'),       # Replace \] with ]
-        (r'\\<', r'<'),        # Replace \< with <
-        (r'\\>', r'>'),        # Replace \> with >
-        (r'\\\{', r'{'),       # Replace \{ with {
-        (r'\\\}', r'}'),       # Replace \} with }
-        (r'\\\*', r'*'),       # Replace \* with *
-        (r'\\\|', r'|'),       # Replace \| with |
-        (r'#+[ \t]*---', r'---'), # Replace any header-interpreted separator (# ---, ## ---, ### ---)
+    # Pairs of (Source Dir, Output Dir)
+    dirs_to_process = [
+        (os.path.join(app_path, 'google_docx'), os.path.join(app_path, 'google_md')),
+        (app_path, app_path)
     ]
     
-    for pattern, repl in replacements:
-        content = re.sub(pattern, repl, content)
+    count_docx = 0
+    
+    for docx_dir, md_dir in dirs_to_process:
+        if not os.path.exists(docx_dir):
+            continue
+            
+        if not os.path.exists(md_dir):
+            os.makedirs(md_dir)
+            
+        print(f"Scanning for DOCX in: {docx_dir}")
         
-    # Prepend YAML header if missing
-    yaml_header = "---\noutput: word_document\n---\n\n"
-    if not content.startswith("---"):
-        content = yaml_header + content
-        
-    return content
+        for filename in os.listdir(docx_dir):
+            if filename.lower().endswith(".docx"):
+                # Skip temporary Word files (start with ~$)
+                if filename.startswith("~$"):
+                    continue
+                    
+                docx_path = os.path.join(docx_dir, filename)
+                # Create corresponding md filename
+                md_filename = os.path.splitext(filename)[0] + ".md"
+                md_path = os.path.join(md_dir, md_filename)
+                
+                # If source and dest are same (root), output is just filename
+                rel_output = os.path.relpath(md_path, app_path)
+                print(f"Preprocessing: {filename} -> {rel_output}")
+                
+                try:
+                    # Convert docx to md using Pandoc (with wrap=none to avoid line breaks breaking formulas)
+                    cmd = ['pandoc', docx_path, '-f', 'docx', '-t', 'markdown-simple_tables-multiline_tables-grid_tables', '--wrap=none', '-o', md_path]
+                    subprocess.run(cmd, check=True)
+                    print(f"  [Pre-process] Converted to Markdown.")
+                    count_docx += 1
+                except subprocess.CalledProcessError as e:
+                    print(f"  [Pre-process] Failed: {e}")
+                except Exception as e:
+                    print(f"  [Pre-process] Error: {e}")
+                
+    if count_docx > 0:
+        print(f"Pre-processed {count_docx} DOCX files to Markdown.\n")
 
 def process_docs():
     app_path = get_application_path()
@@ -76,6 +104,9 @@ def process_docs():
     if not has_pandoc:
         print("WARNING: Pandoc not found. Markdown files will be fixed, but conversion to Word will be skipped.")
         print("Please install Pandoc (https://pandoc.org/) to enable Word conversion.")
+    else:
+        # Step 0: Pre-process DOCX files if any
+        process_docx_files(app_path)
 
     count_fixed = 0
     count_converted = 0

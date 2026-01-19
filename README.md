@@ -1,7 +1,3 @@
----
-output: word_document
----
-
 # Google Docs Markdown Fixer
 
 A lightweight utility to fix formatting issues in Markdown files exported from Google Docs.
@@ -38,7 +34,9 @@ It specifically handles:
 
 ## Usage
 
-1. **Prepare Files**: Place your exported Google Docs Markdown files (the broken ones) into the `google_md` folder.
+1. **Prepare Files**: 
+   - **Option A (Markdown)**: Place your exported Google Docs Markdown files (the broken ones) into the `google_md` folder.
+   - **Option B (Word)**: Place your Google Docs `.docx` files into the `google_docx` folder (or the root directory). The script will first convert them to Markdown, fix the equations, and then process them.
 2. **Run the Script**:
    ```bash
    python fix_md.py

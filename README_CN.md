@@ -1,7 +1,3 @@
----
-output: word_document
----
-
 # Google Docs Markdown 修复工具说明书
 
 ## 1. 项目背景
@@ -41,7 +37,9 @@ output: word_document
 - Python 3.x
 
 ### 操作步骤
-1.  **准备文件**: 将需要修复的 `.md` 文件放入项目的 `google_md` 目录中。
+1.  **准备文件**: 
+    -   **方式 A (.md)**: 将需要修复的 `.md` 文件放入项目的 `google_md` 目录中。
+    -   **方式 B (.docx)**: 将 Google Docs 下载的 `.docx` 文件放入 `google_docx` 目录（或项目根目录）中。脚本会自动预处理。
 2.  **运行脚本**:
     在终端（VS Code Terminal 或 PowerShell）中运行以下命令：
     ```powershell
