@@ -1,0 +1,21 @@
+# Build Artifacts
+build/
+dist/
+*.spec
+*.rar
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# User Data / Output
+word_output/*
+!word_output/.gitkeep
+google_md/*
+!google_md/.gitkeep
+google_docx/*
+!google_docx/.gitkeep
+
+# IDE Settings
+.vscode/
+.idea/

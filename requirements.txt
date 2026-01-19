@@ -1,0 +1,2 @@
+# Development Dependencies
+pyinstaller>=5.0
