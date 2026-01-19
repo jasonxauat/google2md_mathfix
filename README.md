@@ -5,7 +5,7 @@ A lightweight utility to fix formatting issues in Markdown files exported from G
 **Specific Use Case**: This tool is designed to fix the "aggressive escaping" issues that occur when **Gemini-generated content** (especially mathematical formulas) is saved to **Google Docs** and then exported as **Markdown**.
 
 It specifically handles:
-- **LaTeX Math Repair**: Restores formulas broken by escaping (e.g., `\tau` becoming `\tau`).
+- **LaTeX Math Repair**: Restores formulas broken by escaping (e.g., `\\tau` becoming `\tau`).
 - **Special Character Fixes**: Restores `_`, `=`, `.`, `+`, `[` which are often incorrectly escaped.
 
 [ [中文说明](README_CN.md) ]
@@ -72,9 +72,9 @@ If you want to create a standalone `.exe` file to run without Python installed:
 
 ## How it Works
 The script applies a series of strictly ordered Regular Expressions to reverse the escaping done by Google Docs.
-1. Restores `\` to `\` (critical for LaTeX).
+1. Restores `\\` to `\` (critical for LaTeX).
 2. Restores `_`, `=`, `-` etc. to their original characters.
-3. Restores horizontal rules (`---`) often broken as `---`.
+3. Restores horizontal rules (`---`) often broken as `## ---`.
 
 ## License
 MIT License
