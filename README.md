@@ -64,10 +64,10 @@ If you want to create a standalone `.exe` file to run without Python installed:
    ```
 2. **Build**:
    ```bash
-   pyinstaller MD_Processor.spec
+   pyinstaller google2md_mathfix.spec
    ```
 3. **Locate Executable**:
-   The generated file will be in the `dist` folder: `dist/MD_Processor.exe`.
+   The generated file will be in the `dist` folder: `dist/google2md_mathfix.exe`.
    You can copy this `.exe` file to any folder containing your markdown files (or `google_md` folder) and run it directly.
 
 ## How it Works

@@ -155,12 +155,22 @@ def process_docs():
                 # --- 2. Convert to Docx ---
                 if has_pandoc:
                     output_filename = os.path.splitext(filename)[0] + ".docx"
-                    output_path = os.path.join(output_dir, output_filename)
+                    
+                    # Determine target output directory
+                    if current_dir == google_md_path:
+                        target_output_dir = output_dir # word_output
+                    else:
+                        target_output_dir = app_path   # root
+                        
+                    output_path = os.path.join(target_output_dir, output_filename)
                     
                     try:
                         cmd = ['pandoc', filepath, '-o', output_path]
                         subprocess.run(cmd, check=True)
-                        print(f"  [Convert] Created: word_output/{output_filename}")
+                        
+                        # Pretty print relative path for the user
+                        rel_output = os.path.relpath(output_path, app_path)
+                        print(f"  [Convert] Created: {rel_output}")
                         count_converted += 1
                     except subprocess.CalledProcessError as e:
                         print(f"  [Convert] Failed: {e}")

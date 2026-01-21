@@ -68,10 +68,10 @@ Processing: ...\google_md\1.md
     ```
 2.  **执行打包**:
     ```bash
-    pyinstaller MD_Processor.spec
+    pyinstaller google2md_mathfix.spec
     ```
 3.  **获取程序**:
-    打包完成后，可执行文件位于 `dist` 文件夹中：`dist/MD_Processor.exe`。
+    打包完成后，可执行文件位于 `dist` 文件夹中：`dist/google2md_mathfix.exe`。
     您可以将该 `.exe` 文件复制到任何包含 `.md` 文件的目录（或与 `google_md` 同级）直接运行。
 
 ## 6. 注意事项
